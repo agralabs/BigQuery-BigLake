@@ -65,3 +65,5 @@ Apache Iceberg is an open table format that sits **on top of** your Parquet file
 | **Schema Evolution** | ⚠️ Limited (Add columns only) | ❌ Difficult (Can break old partitions) | ✅ Full (Add, drop, rename, change types) |
 | **Partitioning Logic** | ❌ Not applicable | ✅ Manual (Hardcoded in directory URLs) | ✅ Automatic (Hidden Partitioning) |
 | **Best Use Case** | Long-term archival, read-heavy workloads. | Massive, static historical log/sensor data. | Dynamic Data Lakehouse environments (CDC). |
+
+** For testing please read BQ Managed Table Test.md
