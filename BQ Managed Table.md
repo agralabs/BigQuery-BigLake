@@ -2,6 +2,8 @@
 
 When building a large-scale Data Lakehouse architecture, it is crucial to understand the distinct roles of the physical storage format, the directory organization method, and the logical table format layer. This document breaks down these three fundamental concepts, detailing their strengths and weaknesses.
 
+**For testing please read [BQ Managed Table Test.md](BQ-Managed-Table-Test.md)**
+
 ---
 
 ## 1. Apache Parquet (Physical Storage Layer / File Format)
@@ -66,4 +68,3 @@ Apache Iceberg is an open table format that sits **on top of** your Parquet file
 | **Partitioning Logic** | ❌ Not applicable | ✅ Manual (Hardcoded in directory URLs) | ✅ Automatic (Hidden Partitioning) |
 | **Best Use Case** | Long-term archival, read-heavy workloads. | Massive, static historical log/sensor data. | Dynamic Data Lakehouse environments (CDC). |
 
-** For testing please read BQ Managed Table Test.md
