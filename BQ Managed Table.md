@@ -2,7 +2,7 @@
 
 When building a large-scale Data Lakehouse architecture, it is crucial to understand the distinct roles of the physical storage format, the directory organization method, and the logical table format layer. This document breaks down these three fundamental concepts, detailing their strengths and weaknesses.
 
-**For testing please read [BQ Managed Table Test.md](BQ-Managed-Table-Test.md)**
+**For testing please read [BQ Managed Table Test.md](BQ%20Managed%20Table%20Test.md)**
 
 ---
 
