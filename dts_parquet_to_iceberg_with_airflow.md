@@ -6,22 +6,22 @@ This pipeline implements a fully orchestrated batch architecture. **Apache Airfl
 
 ```mermaid
 graph TD
-    subgraph Airflow [Apache Airflow Orchestrator]
+    subgraph Airflow [Apache Airflow Orchestrator - Central Controller]
         direction LR
-        T1(Task 1: Extract & Upload) --> T2(Task 2: Trigger DTS Ingestion) --> T3(Task 3: Trigger Merge)
+        T1[Task 1: Extract & Upload] --> T2[Task 2: Trigger DTS Ingestion] --> T3[Task 3: Trigger Merge]
     end
 
-    subgraph Data_Pipeline [Data Flow]
-        direction LR
+    subgraph Data_Pipeline [Data Flow Layer]
+        direction TB
         DB[(MySQL Database)] ===>|1. Parquet Upload| GCS[Google Cloud Storage]
         GCS ===>|2. DTS Append| Managed[(BigLake Iceberg Table)]
         Managed ===>|3. UPSERT / MERGE| Native[(BigQuery Native Table)]
     end
 
-    %% Control Flow Links
-    T1 -.->|Queries Data| DB
-    T2 -.->|Trigger API| GCS
-    T3 -.->|Trigger API| Managed
+    %% Explicit Control Flows from Airflow Tasks to Pipeline Steps
+    T1 -.->|1. Connect & Extract| DB
+    T2 -.->|2. API Trigger| GCS
+    T3 -.->|3. API Trigger| Managed
 
     classDef airflow fill:#017cee,stroke:#333,stroke-width:2px,color:#fff;
     classDef storage fill:#4285f4,stroke:#333,stroke-width:2px,color:#fff;
