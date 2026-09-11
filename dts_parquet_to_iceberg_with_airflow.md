@@ -279,3 +279,26 @@ WHEN NOT MATCHED AND S.deleted_at IS NULL THEN
   INSERT (id, name, email, created_at, updated_at, deleted_at) 
   VALUES (S.id, S.name, S.email, S.created_at, S.updated_at, S.deleted_at);
 ```
+
+---
+
+## 7. Iceberg DML Behavior & Storage Management (Update/Delete)
+
+When managing old or obsolete data, BigLake Iceberg tables fully support standard SQL DML operations such as `UPDATE` and `DELETE`. However, due to Iceberg's architectural design, understanding how data is physically removed from Google Cloud Storage (GCS) is critical.
+
+### 7.1. How `DELETE` Works in Iceberg
+If you need to purge old data (e.g., `DELETE FROM dts_managed_users WHERE created_at < '2020-01-01'`), BigQuery will execute this successfully. 
+*   **Logical Deletion:** Iceberg utilizes a versioning system (Snapshots). Executing a `DELETE` creates a new snapshot that excludes the deleted rows. The data will immediately become invisible to downstream queries.
+*   **Physical Storage:** The underlying `.parquet` files in GCS are **not deleted immediately**. This is by design, allowing for features like Time Travel and rollback. 
+
+### 7.2. Decreasing GCS File Size (Garbage Collection & Retention)
+To ensure the physical files are removed from GCS and storage costs are reduced after a `DELETE` operation, two processes must occur:
+1.  **Snapshot Expiration:** Old snapshots that reference the deleted files must expire based on the table's retention policy.
+2.  **Garbage Collection (GC):** Unreferenced Parquet files must be physically deleted from the bucket.
+
+**For BigLake Managed Tables:**
+Because `dts_managed_users` is provisioned natively in BigQuery as a Managed Iceberg Table (`table_format = 'ICEBERG'`), you **do not** need to run manual Spark jobs to expire snapshots. BigQuery handles **Automatic Background Maintenance**.
+
+*   **Retention Setting (Time Travel):** BigQuery dictates Iceberg snapshot retention using its **Time Travel Window** setting at the Dataset level.
+*   **Behavior:** By default, BigQuery retains snapshots for **7 days** (configurable down to 2 days). The deleted data remains in GCS for this duration to allow for point-in-time recovery. 
+*   **Physical Deletion:** Once the Time Travel window passes, BigQuery's automated Garbage Collection will physically delete the orphaned `.parquet` files from the GCS bucket, thereby reducing your storage size and costs.
